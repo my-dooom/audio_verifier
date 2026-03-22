@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "generator.h"
+#include "include\generator.h"
 
  void generate_wav(const char* filename, double frequency, double amplitude, double duration){
     int num_samples = SAMPLE_RATE * duration;

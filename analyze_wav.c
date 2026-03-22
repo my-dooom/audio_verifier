@@ -4,25 +4,28 @@
 #include <string.h>
 #include <math.h>
 
+/* WAV file header structure as per RIFF/WAVE format.
+   This defines the layout of the first 44 bytes of a standard WAV file. */
 typedef struct
 {
-    char riff[4];
-    uint32_t file_size;
-    char wave[4];
-    char fmt[4];
-    uint32_t fmt_size;
-    uint16_t audio_format;
-    uint16_t num_channels;
-    uint32_t sample_rate;
-    uint32_t byte_rate;
-    uint16_t block_align;
-    uint16_t bits_per_sample;
-    char data[4];
-    uint32_t data_size;
+    char riff[4];          // "RIFF" chunk identifier
+    uint32_t file_size;    // Total file size minus 8 bytes
+    char wave[4];          // "WAVE" format identifier
+    char fmt[4];           // "fmt " subchunk identifier
+    uint32_t fmt_size;     // Size of fmt subchunk (usually 16 for PCM)
+    uint16_t audio_format; // Audio format (1 = PCM)
+    uint16_t num_channels; // Number of channels (1 = mono, 2 = stereo)
+    uint32_t sample_rate;  // Samples per second (e.g., 44100)
+    uint32_t byte_rate;    // Bytes per second (sample_rate * num_channels * bits_per_sample / 8)
+    uint16_t block_align;  // Bytes per sample frame (num_channels * bits_per_sample / 8)
+    uint16_t bits_per_sample; // Bits per sample (e.g., 16)
+    char data[4];          // "data" subchunk identifier
+    uint32_t data_size;    // Size of data subchunk (number of bytes of audio data)
 } wav_header;
 
+/* Prints usage information to stderr when arguments are invalid. */
 static void print_usage(const char *prog) {
-    fprintf(stderr, "Usage: %s <file.wav> [frequency]", prog);
+    fprintf(stderr, "Usage: %s <file.wav> [frequency]\n", prog);
     fprintf(stderr, "  frequency: expected sine frequency (Hz), defaults to 440.0\n");
 }
 
@@ -99,7 +102,7 @@ int main(int argc, char **argv) {
     double dt = 1.0 / h.sample_rate;
     for (size_t i = 0; i < num_samples; i++) {
         double sample = samples[i] / 32767.0;
-        double expected = sin(2.0 * M_PI * expected_frequency * (i * dt));
+        double expected = sin(2.0 * 3.141592653589793 * expected_frequency * (i * dt));
 
         double abs_sample = fabs(sample);
         if (abs_sample > peak) {
