@@ -4,26 +4,31 @@
 
 # Compiler settings - Can be customized.
 CC = gcc
-CXXFLAGS = -std=c11 -Wall
+CXX = g++
+CFLAGS = -std=c11 -Wall
+CXXFLAGS = -std=c++17 -Wall
 LDFLAGS = 
 
 # Makefile settings - Can be customized.
 APPNAME = audio_verifier
-EXT = .c
-SRCDIR = D:\Developer\_repos\audio_verifier\src
-OBJDIR = D:\Developer\_repos\audio_verifier\obj
+SRCDIR = src
+OBJDIR = obj
+
 
 ############## Do not change anything from here downwards! #############
-SRC = $(wildcard $(SRCDIR)/*$(EXT))
-OBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)/%.o)
+CSRC = $(wildcard $(SRCDIR)/*.c)
+CPPSRC = $(wildcard $(SRCDIR)/*.cpp)
+OBJ = $(CSRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o) \
+      $(CPPSRC:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 DEP = $(OBJ:$(OBJDIR)/%.o=%.d)
 # UNIX-based OS variables & settings
-RM = rm
-DELOBJ = $(OBJ)
+RM = rm -f
+DELOBJ = $(OBJ) $(DEP) $(APPNAME)
 # Windows OS variables & settings
-DEL = del
+DEL = del /Q
 EXE = .exe
-WDELOBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)\\%.o)
+WDELOBJ = $(OBJ) $(DEP) $(APPNAME)$(EXE)
+
 
 ########################################################################
 ####################### Targets beginning here #########################
@@ -33,18 +38,25 @@ all: $(APPNAME)
 
 # Builds the app
 $(APPNAME): $(OBJ)
-	$(CC) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-# Creates the dependecy rules
-%.d: $(SRCDIR)/%$(EXT)
-	@$(CPP) $(CFLAGS) $< -MM -MT $(@:%.d=$(OBJDIR)/%.o) >$@
 
-# Includes all .h files
+# Dependency rules for C
+$(OBJDIR)/%.d: $(SRCDIR)/%.c
+	@$(CC) $(CFLAGS) -MM -MT '$(OBJDIR)/$*.o' $< > $@
+# Dependency rules for C++
+$(OBJDIR)/%.d: $(SRCDIR)/%.cpp
+	@$(CXX) $(CXXFLAGS) -MM -MT '$(OBJDIR)/$*.o' $< > $@
+
 -include $(DEP)
 
-# Building rule for .o files and its .c/.cpp in combination with all .h
-$(OBJDIR)/%.o: $(SRCDIR)/%$(EXT)
-	$(CC) $(CXXFLAGS) -o $@ -c $<
+# Build rule for C
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+# Build rule for C++
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
 
 ################### Cleaning rules for Unix-based OS ###################
 # Cleans complete project
