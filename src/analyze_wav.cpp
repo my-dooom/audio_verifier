@@ -15,7 +15,7 @@ extern "C" {
 
         // FFT (using fftw)
         fftw_complex* out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * num_samples);
-        fftw_plan plan = fftw_plan_dft_r2c_1d(num_samples, input.data(), out, FFTW_ESTIMATE);
+        fftw_plan plan = fftw_plan_dft_r2c_1d(num_samples, input.data(), out, FFTW_ES`TIMATE);
         fftw_execute(plan);
 
         // Find peak frequency

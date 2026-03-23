@@ -3,32 +3,27 @@
 ########################################################################
 
 # Compiler settings - Can be customized.
-CC = gcc
-CXX = g++
-CFLAGS = -std=c11 -Wall
-CXXFLAGS = -std=c++17 -Wall
+CC = g++
+CXXFLAGS = -std=c++11 -Wall
 LDFLAGS = 
 
 # Makefile settings - Can be customized.
 APPNAME = audio_verifier
+EXT = .cpp
 SRCDIR = src
 OBJDIR = obj
 
-
 ############## Do not change anything from here downwards! #############
-CSRC = $(wildcard $(SRCDIR)/*.c)
-CPPSRC = $(wildcard $(SRCDIR)/*.cpp)
-OBJ = $(CSRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o) \
-      $(CPPSRC:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+SRC = $(wildcard $(SRCDIR)/*$(EXT))
+OBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)/%.o)
 DEP = $(OBJ:$(OBJDIR)/%.o=%.d)
 # UNIX-based OS variables & settings
-RM = rm -f
-DELOBJ = $(OBJ) $(DEP) $(APPNAME)
+RM = rm
+DELOBJ = $(OBJ)
 # Windows OS variables & settings
-DEL = del /Q
+DEL = del
 EXE = .exe
-WDELOBJ = $(OBJ) $(DEP) $(APPNAME)$(EXE)
-
+WDELOBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)\\%.o)
 
 ########################################################################
 ####################### Targets beginning here #########################
@@ -38,25 +33,18 @@ all: $(APPNAME)
 
 # Builds the app
 $(APPNAME): $(OBJ)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
+# Creates the dependecy rules
+%.d: $(SRCDIR)/%$(EXT)
+	@$(CPP) $(CFLAGS) $< -MM -MT $(@:%.d=$(OBJDIR)/%.o) >$@
 
-# Dependency rules for C
-$(OBJDIR)/%.d: $(SRCDIR)/%.c
-	@$(CC) $(CFLAGS) -MM -MT '$(OBJDIR)/$*.o' $< > $@
-# Dependency rules for C++
-$(OBJDIR)/%.d: $(SRCDIR)/%.cpp
-	@$(CXX) $(CXXFLAGS) -MM -MT '$(OBJDIR)/$*.o' $< > $@
-
+# Includes all .h files
 -include $(DEP)
 
-# Build rule for C
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
-# Build rule for C++
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
-
+# Building rule for .o files and its .c/.cpp in combination with all .h
+$(OBJDIR)/%.o: $(SRCDIR)/%$(EXT)
+	$(CC) $(CXXFLAGS) -o $@ -c $<
 
 ################### Cleaning rules for Unix-based OS ###################
 # Cleans complete project
