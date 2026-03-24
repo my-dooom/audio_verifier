@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-ID:\Developer\_repos\vcpkg\installed\x64-windows\include]
