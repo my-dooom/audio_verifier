@@ -1,2 +1,5 @@
 sinusoid.wav
 audio_verifier.exe
+*.d
+*.dll
+obj/*
