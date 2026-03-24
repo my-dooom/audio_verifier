@@ -4,8 +4,17 @@
 
 # Compiler settings - Can be customized.
 CC = g++
+VCPKG_ROOT = D:\Developer\_repos\vcpkg\installed\x64-windows
+
 CXXFLAGS = -std=c++11 -Wall
 LDFLAGS = 
+
+
+CXXFLAGS += -I"$(VCPKG_ROOT)/include"
+
+# Dodaj flagi do LDFLAGS (dla linkowania)
+LDFLAGS += -L"$(VCPKG_ROOT)/lib" -lfftw3
+
 
 # Makefile settings - Can be customized.
 APPNAME = audio_verifier
